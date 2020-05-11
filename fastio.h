@@ -1,6 +1,7 @@
+#include <cassert>
 #include <cmath>
-#include <cstdio>
 #include <cstdint>
+#include <cstdio>
 #include <cstring>
 
 #include <array>
@@ -25,24 +26,25 @@ struct Ofast {
 		close(fd);
 	}
 
-	void flush() {
-		write(fd, buffer, idx);
+	void flush() noexcept {
+		[[maybe_unused]] ssize_t rc = write(fd, buffer, idx);
+		assert(rc >= 0);
 		idx = 0;
 	}
 
-	void flush_if(size_t x) {
+	void flush_if(size_t x) noexcept {
 		if (sizeof(buffer) - idx < x)
 			flush();
 	}
 
-	Ofast& operator<< (const char c) {
+	Ofast& operator<< (const char c) noexcept {
 		flush_if(1);
 		buffer[idx++] = c;
 		return *this;
 	}
 
 	template <class T, class = enable_if_t<is_integral<T>::value>>
-	Ofast& operator<< (T a) {
+	Ofast& operator<< (T a) noexcept {
 		char d[(long)(sizeof(T) * log10(256)) + 1];
 		uint8_t i = sizeof(d);
 
@@ -65,7 +67,7 @@ struct Ofast {
 		return *this;
 	}
 
-	Ofast& operator<< (const char* s) {
+	Ofast& operator<< (const char* const s) noexcept {
 		size_t len = strlen(s);
 		flush_if(len);
 		memcpy(buffer + idx, s, len);
@@ -73,38 +75,38 @@ struct Ofast {
 		return *this;
 	}
 
-	Ofast& operator<< (const string_view s) {
+	Ofast& operator<< (const string_view s) noexcept {
 		flush_if(s.size());
 		memcpy(buffer + idx, s.data(), s.size());
 		idx += s.size();
 		return *this;
 	}
 
-	Ofast& operator<< (const string& s) {
+	Ofast& operator<< (const string& s) noexcept {
 		flush_if(s.size());
 		memcpy(buffer + idx, s.data(), s.size());
 		idx += s.size();
 		return *this;
 	}
 
-	Ofast& operator<< (const double a) {
+	Ofast& operator<< (const double a) noexcept {
 		flush_if(32);
 		idx += sprintf(buffer + idx, "%g", a);
 		return *this;
 	}
 
 	template <class T>
-	void helper2(size_t i, const T& v, size_t j) {
+	void helper2(const size_t i, const T& v, const size_t j) noexcept {
 		if (i == j) *this << v;
 	}
 
 	template <class ... T, size_t ... Is>
-	void helper(size_t i, const T& ... v, index_sequence<Is...>) {
+	void helper(const size_t i, const T& ... v, const index_sequence<Is...>) noexcept {
 		((helper2(i, v, Is)), ...);
 	}
 
 	template <class ... T>
-	void operator() (const char* s, const T& ... v) {
+	void operator() (const char* s, const T& ... v) noexcept {
 		size_t i = 0;
 		while (*s) {
 			if (*s == '%')
@@ -116,11 +118,11 @@ struct Ofast {
 	}
 };
 
-constexpr array<bool, 256> digits() {
-    array<bool, 256> table {};
-    for (char c = '0'; c <= '9'; c++)
-        table[c] = true;
-    return table;
+[[nodiscard]] constexpr array<bool, 256> digits() noexcept {
+	array<bool, 256> table {};
+	for (char c = '0'; c <= '9'; c++)
+		table[c] = true;
+	return table;
 }
 constexpr const array<bool, 256> is_digit = digits();
 
@@ -132,21 +134,23 @@ struct Ifast {
 	Ifast(int fd) : fd(fd) {}
 	Ifast(FILE* f) : fd(fileno(f)) {}
 
-	void flush() {
+	void flush() noexcept {
 		if (idx == size) {
-			size = read(fd, buffer, sizeof(buffer));
+			ssize_t s = read(fd, buffer, sizeof(buffer));
+			assert(s >= 0);
+			size = s;
 			idx = 0;
 		}
 	}
 
-	Ifast& operator>> (char& c) {
+	Ifast& operator>> (char& c) noexcept {
 		flush();
 		c = buffer[idx++];
 		return *this;
 	}
 
 	template <class T, class = enable_if_t<is_integral<T>::value>>
-	Ifast& operator>> (T& i) {
+	Ifast& operator>> (T& i) noexcept {
 		while (flush(), buffer[idx] <= 32) idx ++;
 
 		bool sign = false;

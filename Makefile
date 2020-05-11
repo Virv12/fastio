@@ -1,4 +1,4 @@
-CC=g++ -std=c++17 -Wall -Wextra -Ofast
+CC=g++ -std=c++17 -Ofast -Wall -Wextra -Ofast -DNDEBUG
 
 run: main
 	./main >/dev/null
