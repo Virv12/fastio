@@ -1,0 +1,2 @@
+# fastio
+Modern c++ fastio
