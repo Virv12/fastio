@@ -4,9 +4,10 @@
 #include <cstring>
 
 #include <array>
-#include <utility>
 #include <string>
 #include <string_view>
+#include <type_traits>
+#include <utility>
 
 #include <unistd.h>
 using namespace std;
@@ -40,12 +41,11 @@ struct Ofast {
 		return *this;
 	}
 
-	template <class T>
+	template <class T, class = enable_if_t<is_integral<T>::value>>
 	Ofast& operator<< (T a) {
 		char d[(long)(sizeof(T) * log10(256)) + 1];
 		uint8_t i = sizeof(d);
 
-		static_assert(is_integral<T>::value, "Integral required");
 		static_assert(sizeof(d) <= 256);
 
 		if constexpr (is_signed<T>::value)
@@ -145,10 +145,8 @@ struct Ifast {
 		return *this;
 	}
 
-	template <class T>
+	template <class T, class = enable_if_t<is_integral<T>::value>>
 	Ifast& operator>> (T& i) {
-		static_assert(is_integral<T>::value, "Integral required");
-
 		while (flush(), buffer[idx] <= 32) idx ++;
 
 		bool sign = false;
