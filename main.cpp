@@ -7,9 +7,9 @@
 using namespace std;
 using namespace IOfast;
 
-Ifast fastin(stdin);
-Ofast fastout(stdout);
-Ofast fasterr(stderr);
+Ifast fastin(STDIN_FILENO);
+Ofast fastout(STDOUT_FILENO);
+Ofast fasterr(STDERR_FILENO);
 
 long gettime() {
 	timespec t;
@@ -73,14 +73,14 @@ int main() {
 	fasterr.flush();
 	
 	{
-		Ofast fout(fopen("tmp.txt", "wt"));
+		Ofast fout("tmp.txt");
 		for (size_t i = 0; i < 1e6; i++)
 			fout("% ", INT_MIN);
 		fout.flush();
 	}
 
 	{
-		Ifast fin(fopen("tmp.txt", "rt"));
+		Ifast fin("tmp.txt");
 		int x;
 		SPEED_TEST(1e6, fin >> x, );
 	}

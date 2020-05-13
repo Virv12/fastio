@@ -11,6 +11,7 @@
 #include <utility>
 
 #include <unistd.h>
+#include <fcntl.h>
 
 #ifndef BUFFER_SIZE
 #define BUFFER_SIZE 1 << 16
@@ -28,8 +29,10 @@ namespace IOfast {
 		size_t idx = 0;
 		const int fd;
 
-		Ofast(int fd) : fd(fd) {}
-		Ofast(FILE* f) : fd(fileno(f)) {}
+		[[nodiscard]] explicit Ofast(const int fd) noexcept : fd(fd) {}
+		[[nodiscard]] explicit Ofast(const char* const f) noexcept : fd(open(f, O_WRONLY)) {}
+		Ofast(const Ofast&) = delete;
+		Ofast& operator= (const Ofast&) = delete;
 
 #if NO_AUTO_FLUSH < 1
 		~Ofast() {
@@ -150,8 +153,10 @@ namespace IOfast {
 		size_t idx = 0, size = 0;
 		const int fd;
 
-		Ifast(int fd) : fd(fd) {}
-		Ifast(FILE* f) : fd(fileno(f)) {}
+		[[nodiscard]] explicit Ifast(const int fd) noexcept : fd(fd) {}
+		[[nodiscard]] explicit Ifast(const char* const f) noexcept : fd(open(f, O_RDONLY)) {}
+		Ifast(const Ifast&) = delete;
+		Ifast& operator= (const Ifast&) = delete;
 
 		void flush() noexcept {
 #if NO_AUTO_FLUSH < 2

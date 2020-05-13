@@ -5,8 +5,8 @@ Modern c++ fastio
 ```c++
 #include "fastio.h"
 
-IOfast::Ifast fastin(stdin);
-IOfast::Ofast fastout(stdout);
+IOfast::Ifast fastin(STDIN_FILENO);
+IOfast::Ofast fastout(STDOUT_FILENO);
 
 int main() {
   int x;
@@ -16,3 +16,4 @@ int main() {
   fastout("X: %\n", x);
   fastout.flush();
 }
+```
