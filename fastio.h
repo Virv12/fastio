@@ -22,7 +22,7 @@ using namespace std;
 #endif
 
 struct Ofast {
-	char buffer[BUFFER_SIZE];
+	array<char, BUFFER_SIZE> buffer;
 	size_t idx = 0;
 	const int fd;
 
@@ -37,14 +37,14 @@ struct Ofast {
 #endif
 
 	void flush() noexcept {
-		[[maybe_unused]] ssize_t rc = write(fd, buffer, idx);
+		[[maybe_unused]] ssize_t rc = write(fd, buffer.data(), idx);
 		assert(rc >= 0);
 		idx = 0;
 	}
 
 	void flush_if(size_t x) noexcept {
 #if NO_AUTO_FLUSH < 2
-		if (sizeof(buffer) - idx < x)
+		if (buffer.size() - idx < x)
 			flush();
 #endif
 	}
@@ -79,7 +79,7 @@ struct Ofast {
 				d[--i] = '-';
 
 		flush_if(d.size() - i);
-		memcpy(buffer + idx, d.data() + i, d.size() - i);
+		memcpy(&buffer[idx], &d[i], d.size() - i);
 		idx += d.size() - i;
 		return *this;
 	}
@@ -87,28 +87,28 @@ struct Ofast {
 	Ofast& operator<< (const char* const s) noexcept {
 		size_t len = strlen(s);
 		flush_if(len);
-		memcpy(buffer + idx, s, len);
+		memcpy(&buffer[idx], s, len);
 		idx += len;
 		return *this;
 	}
 
 	Ofast& operator<< (const string_view s) noexcept {
 		flush_if(s.size());
-		memcpy(buffer + idx, s.data(), s.size());
+		memcpy(&buffer[idx], s.data(), s.size());
 		idx += s.size();
 		return *this;
 	}
 
 	Ofast& operator<< (const string& s) noexcept {
 		flush_if(s.size());
-		memcpy(buffer + idx, s.data(), s.size());
+		memcpy(&buffer[idx], s.data(), s.size());
 		idx += s.size();
 		return *this;
 	}
 
 	Ofast& operator<< (const double a) noexcept {
 		flush_if(32);
-		idx += sprintf(buffer + idx, "%g", a);
+		idx += sprintf(&buffer[idx], "%g", a);
 		return *this;
 	}
 
@@ -144,7 +144,7 @@ struct Ofast {
 constexpr const array<bool, 256> is_digit = digits();
 
 struct Ifast {
-	char buffer[BUFFER_SIZE];
+	array<char, BUFFER_SIZE> buffer;
 	size_t idx = 0, size = 0;
 	const int fd;
 
@@ -154,7 +154,7 @@ struct Ifast {
 	void flush() noexcept {
 #if NO_AUTO_FLUSH < 2
 		if (idx == size) {
-			ssize_t s = read(fd, buffer, sizeof(buffer));
+			ssize_t s = read(fd, buffer.data(), buffer.size());
 			assert(s >= 0);
 			size = s;
 			idx = 0;
