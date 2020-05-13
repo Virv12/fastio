@@ -5,6 +5,7 @@
 
 #include "fastio.h"
 using namespace std;
+using namespace IOfast;
 
 Ifast fastin(stdin);
 Ofast fastout(stdout);
