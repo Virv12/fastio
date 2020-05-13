@@ -29,7 +29,7 @@ struct Ofast {
 	Ofast(int fd) : fd(fd) {}
 	Ofast(FILE* f) : fd(fileno(f)) {}
 
-#if NO_AUTO_BUFFER < 1
+#if NO_AUTO_FLUSH < 1
 	~Ofast() {
 		flush();
 		close(fd);
