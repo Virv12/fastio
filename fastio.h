@@ -58,33 +58,33 @@ namespace IOfast {
 		}
 
 		template <class T, class = enable_if_t<is_integral<T>::value>,
-				 class unsT = typename make_unsigned<T>::type>
-					 Ofast& operator<< (const T a) noexcept {
-						 array<char, (long)(sizeof(T) * log10(256)) + 1 + is_signed<T>::value> d;
-						 uint8_t i = d.size();
+			class unsT = typename make_unsigned<T>::type>
+		Ofast& operator<< (const T a) noexcept {
+			array<char, (long)(sizeof(T) * log10(256)) + 1 + is_signed<T>::value> d;
+			uint8_t i = d.size();
 
-						 static_assert(d.size() <= 256);
+			static_assert(d.size() <= 256);
 
-						 unsT u = a;
+			unsT u = a;
 
-						 if constexpr (is_signed<T>::value)
-							 if (signbit(a))
-								 u = -u;
+			if constexpr (is_signed<T>::value)
+				if (signbit(a))
+					u = -u;
 
-						 do {
-							 d[--i] = u % 10 + '0';
-							 u /= 10;
-						 } while (u);
+			do {
+				d[--i] = u % 10 + '0';
+				u /= 10;
+			} while (u);
 
-						 if constexpr (is_signed<T>::value)
-							 if (signbit(a))
-								 d[--i] = '-';
+			if constexpr (is_signed<T>::value)
+				if (signbit(a))
+					d[--i] = '-';
 
-						 flush_if(d.size() - i);
-						 memcpy(&buffer[idx], &d[i], d.size() - i);
-						 idx += d.size() - i;
-						 return *this;
-					 }
+			flush_if(d.size() - i);
+			memcpy(&buffer[idx], &d[i], d.size() - i);
+			idx += d.size() - i;
+			return *this;
+		}
 
 		Ofast& operator<< (const char* const s) noexcept {
 			size_t len = strlen(s);
@@ -115,26 +115,26 @@ namespace IOfast {
 		}
 
 		template <class T>
-			void helper2(const size_t i, const T& v, const size_t j) noexcept {
-				if (i == j) *this << v;
-			}
+		void helper2(const size_t i, const T& v, const size_t j) noexcept {
+			if (i == j) *this << v;
+		}
 
 		template <class ... T, size_t ... Is>
-			void helper(const size_t i, const T& ... v, const index_sequence<Is...>) noexcept {
-				((helper2(i, v, Is)), ...);
-			}
+		void helper(const size_t i, const T& ... v, const index_sequence<Is...>) noexcept {
+			((helper2(i, v, Is)), ...);
+		}
 
 		template <class ... T>
-			void operator() (const char* s, const T& ... v) noexcept {
-				size_t i = 0;
-				while (*s) {
-					if (*s == '%')
-						helper<T ...>(i++, v ..., make_index_sequence<sizeof...(T)>());
-					else
-						*this << *s;
-					s++;
-				}
+		void operator() (const char* s, const T& ... v) noexcept {
+			size_t i = 0;
+			while (*s) {
+				if (*s == '%')
+					helper<T ...>(i++, v ..., make_index_sequence<sizeof...(T)>());
+				else
+					*this << *s;
+				s++;
 			}
+		}
 	};
 
 	[[nodiscard]] constexpr array<bool, 256> digits() noexcept {
@@ -171,24 +171,24 @@ namespace IOfast {
 		}
 
 		template <class T, class = enable_if_t<is_integral<T>::value>>
-			Ifast& operator>> (T& i) noexcept {
-				while (flush(), buffer[idx] <= 32) idx ++;
+		Ifast& operator>> (T& i) noexcept {
+			while (flush(), buffer[idx] <= 32) idx ++;
 
-				bool sign = false;
-				if constexpr (is_signed<T>::value)
-					if (buffer[idx] == '-') {
-						sign = 1;
-						idx++;
-					}
+			bool sign = false;
+			if constexpr (is_signed<T>::value)
+				if (buffer[idx] == '-') {
+					sign = 1;
+					idx++;
+				}
 
-				i = 0;
-				while (flush(), is_digit[buffer[idx]])
-					i = 10 * i + buffer[idx++] - '0';
+			i = 0;
+			while (flush(), is_digit[buffer[idx]])
+				i = 10 * i + buffer[idx++] - '0';
 
-				if constexpr (is_signed<T>::value)
-					if (sign) i *= -1;
+			if constexpr (is_signed<T>::value)
+				if (sign) i *= -1;
 
-				return *this;
-			}
+			return *this;
+		}
 	};
 }
