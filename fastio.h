@@ -58,13 +58,14 @@ struct Ofast {
 	template <class T, class = enable_if_t<is_integral<T>::value>,
 		class unsT = typename make_unsigned<T>::type>
 	Ofast& operator<< (const T a) noexcept {
-		char d[(long)(sizeof(T) * log10(256)) + 1];
-		uint8_t i = sizeof(d);
+		array<char, (long)(sizeof(T) * log10(256)) + 1 + is_signed<T>::value> d;
+		uint8_t i = d.size();
 
-		static_assert(sizeof(d) <= 256);
+		static_assert(d.size() <= 256);
 
 		unsT u = a;
 
+#if false
 		if constexpr (is_signed<T>::value)
 			if (signbit(a)) {
 				*this << '-';
@@ -75,10 +76,27 @@ struct Ofast {
 			d[--i] = u % 10 + '0';
 			u /= 10;
 		} while (u);
+#else
+		if constexpr (is_signed<T>::value)
+			if (signbit(a))
+				u = -u;
 
-		flush_if(sizeof(d) - i);
-		memcpy(buffer + idx, d + i, sizeof(d) - i);
-		idx += sizeof(d) - i;
+		do {
+			d[--i] = u % 10 + '0';
+			u /= 10;
+		} while (u);
+
+		if constexpr (is_signed<T>::value)
+			if (signbit(a))
+				d[--i] = '-';
+#endif
+
+		if (i >= d.size())
+			exit(1);
+
+		flush_if(d.size() - i);
+		memcpy(buffer + idx, d.data() + i, d.size() - i);
+		idx += d.size() - i;
 		return *this;
 	}
 
