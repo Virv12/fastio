@@ -75,6 +75,7 @@ int main() {
 		Ofast fout(fopen("tmp.txt", "wt"));
 		for (size_t i = 0; i < 1e6; i++)
 			fout("% ", INT_MIN);
+		fout.flush();
 	}
 
 	{

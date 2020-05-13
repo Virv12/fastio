@@ -13,18 +13,28 @@
 #include <unistd.h>
 using namespace std;
 
+#ifndef BUFFER_SIZE
+#define BUFFER_SIZE 1 << 16
+#endif
+
+#ifndef NO_AUTO_FLUSH
+#define NO_AUTO_FLUSH 1
+#endif
+
 struct Ofast {
-	char buffer[1 << 16];
+	char buffer[BUFFER_SIZE];
 	size_t idx = 0;
-	int fd;
+	const int fd;
 
 	Ofast(int fd) : fd(fd) {}
 	Ofast(FILE* f) : fd(fileno(f)) {}
 
+#if NO_AUTO_BUFFER < 1
 	~Ofast() {
 		flush();
 		close(fd);
 	}
+#endif
 
 	void flush() noexcept {
 		[[maybe_unused]] ssize_t rc = write(fd, buffer, idx);
@@ -33,8 +43,10 @@ struct Ofast {
 	}
 
 	void flush_if(size_t x) noexcept {
+#if NO_AUTO_FLUSH < 2
 		if (sizeof(buffer) - idx < x)
 			flush();
+#endif
 	}
 
 	Ofast& operator<< (const char c) noexcept {
@@ -43,23 +55,26 @@ struct Ofast {
 		return *this;
 	}
 
-	template <class T, class = enable_if_t<is_integral<T>::value>>
-	Ofast& operator<< (T a) noexcept {
+	template <class T, class = enable_if_t<is_integral<T>::value>,
+		class unsT = typename make_unsigned<T>::type>
+	Ofast& operator<< (const T a) noexcept {
 		char d[(long)(sizeof(T) * log10(256)) + 1];
 		uint8_t i = sizeof(d);
 
 		static_assert(sizeof(d) <= 256);
 
+		unsT u = a;
+
 		if constexpr (is_signed<T>::value)
 			if (signbit(a)) {
 				*this << '-';
-				a *= -1;
+				u = -u;
 			}
 
 		do {
-			d[--i] = a % 10 + '0';
-			a /= 10;
-		} while (a);
+			d[--i] = u % 10 + '0';
+			u /= 10;
+		} while (u);
 
 		flush_if(sizeof(d) - i);
 		memcpy(buffer + idx, d + i, sizeof(d) - i);
@@ -127,20 +142,22 @@ struct Ofast {
 constexpr const array<bool, 256> is_digit = digits();
 
 struct Ifast {
-	char buffer[1 << 16];
+	char buffer[BUFFER_SIZE];
 	size_t idx = 0, size = 0;
-	int fd;
+	const int fd;
 
 	Ifast(int fd) : fd(fd) {}
 	Ifast(FILE* f) : fd(fileno(f)) {}
 
 	void flush() noexcept {
+#if NO_AUTO_FLUSH < 2
 		if (idx == size) {
 			ssize_t s = read(fd, buffer, sizeof(buffer));
 			assert(s >= 0);
 			size = s;
 			idx = 0;
 		}
+#endif
 	}
 
 	Ifast& operator>> (char& c) noexcept {
