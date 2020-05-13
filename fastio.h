@@ -65,18 +65,6 @@ struct Ofast {
 
 		unsT u = a;
 
-#if false
-		if constexpr (is_signed<T>::value)
-			if (signbit(a)) {
-				*this << '-';
-				u = -u;
-			}
-
-		do {
-			d[--i] = u % 10 + '0';
-			u /= 10;
-		} while (u);
-#else
 		if constexpr (is_signed<T>::value)
 			if (signbit(a))
 				u = -u;
@@ -89,10 +77,6 @@ struct Ofast {
 		if constexpr (is_signed<T>::value)
 			if (signbit(a))
 				d[--i] = '-';
-#endif
-
-		if (i >= d.size())
-			exit(1);
 
 		flush_if(d.size() - i);
 		memcpy(buffer + idx, d.data() + i, d.size() - i);
