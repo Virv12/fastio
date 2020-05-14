@@ -1,4 +1,4 @@
-CC=g++ -std=c++20 -Ofast -Wall -Wextra -Ofast -DNDEBUG
+CC=g++ -std=c++20 -Ofast -Wall -Wextra -Wpedantic -DNDEBUG
 
 run: main
 	./main >/dev/null

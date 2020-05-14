@@ -1,7 +1,6 @@
 #include <cassert>
 #include <cmath>
 #include <cstdint>
-#include <cstdio>
 #include <cstring>
 
 #include <array>
@@ -111,9 +110,54 @@ namespace IOfast {
 			return *this;
 		}
 
-		Ofast& operator<< (const double a) noexcept {
-			flush_if(32);
-			idx += sprintf(&buffer[idx], "%g", a);
+		template <class T, class = enable_if_t<is_floating_point<T>::value>>
+		Ofast& operator<< (T f) noexcept {
+			constexpr size_t precision = 6;
+
+			if constexpr (is_signed<T>::value)
+				if (signbit(f)) {
+					*this << '-';
+					f *= -1;
+				}
+
+			int e = 0;
+			while (f < 1) {
+				f *= 10;
+				e -= 1;
+			}
+			while (f >= 10) {
+				f /= 10;
+				e += 1;
+			}
+
+			if (e <= -5 || e >= 6) {
+				flush_if(precision + 2);
+				for (size_t i = 0; i < precision; i++) {
+					if (i == 1) buffer[idx++] = '.';
+
+					buffer[idx++] = int(f) + '0';
+					f -= int(f);
+					f *= 10;
+				}
+
+				buffer[idx++] = 'e';
+				return *this << e;
+			} else {
+				f *= pow(10, e);
+				return *this << (unsigned)f << '.' << (unsigned)(pow(10, precision - e - 1) * (f - (unsigned)f));
+			}
+		}
+
+		Ofast& operator<< (void* p) noexcept {
+			constexpr const char* const digits = "0123456789abcdef";
+			flush_if(2 * sizeof(void*) + 2);
+
+			buffer[idx++] = '0';
+			buffer[idx++] = 'x';
+
+			for (ssize_t mask = 8 * sizeof(void*) - 4; mask >= 0; mask -= 4)
+				buffer[idx++] = digits[(long)p >> mask & 0xF];
+
 			return *this;
 		}
 
