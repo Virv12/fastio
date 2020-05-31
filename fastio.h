@@ -1,3 +1,6 @@
+#ifndef FASTIO
+#define FASTIO
+
 #include <cassert>
 #include <cmath>
 #include <cstdint>
@@ -241,3 +244,5 @@ namespace IOfast {
 		}
 	};
 }
+
+#endif

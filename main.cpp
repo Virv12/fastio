@@ -7,6 +7,7 @@
 #include <string_view>
 
 #include "fastio.h"
+#include "fastio_ext.h"
 using namespace std;
 using namespace IOfast;
 
@@ -38,6 +39,7 @@ int main() {
 	fasterr("double: %\n", DBL_MIN);
 	fasterr("double: %\n", -DBL_MAX);
 	fasterr("float: %\n", FLT_MAX);
+	fasterr("vector<int>: %\n", vector{3, 4, 5});
 	fasterr << '\n' << nullptr;
 
 	SPEED_TEST(1e7, fastout << 0   , fastout.flush());
