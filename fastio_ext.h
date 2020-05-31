@@ -1,6 +1,7 @@
 #include <array>
 #include <set>
 #include <vector>
+#include <utility>
 
 #include "fastio.h"
 
@@ -38,5 +39,10 @@ namespace IOfast {
 		out << "std::set";
 		print_iters(out, s.begin(), s.end());
 		return out;
+	}
+
+	template <class T1, class T2>
+	Ofast& operator<<(Ofast& out, const std::pair<T1, T2>& p) noexcept {
+		return out << "std::pair{" << p.first << ", " << p.second < '}';
 	}
 }
