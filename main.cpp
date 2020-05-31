@@ -21,7 +21,7 @@ long gettime() {
 	return t.tv_sec * (long)1e9 + t.tv_nsec;
 }
 
-#define SPEED_TEST(n, fn, end) { size_t i = n; long __time = gettime(); while (i--) fn; end; __time = gettime() - __time; fasterr("%:\t%ns\n", #fn, to_string((double)__time / n)); }
+#define SPEED_TEST(n, fn, end) { size_t i = n; long __time = gettime(); while (i--) fn; end; __time = gettime() - __time; fasterr.fmt<"%ns\t%\n">(to_string((double)__time / n), #fn); }
 
 const string long_string = "sfhsfhgalsfhglsvgeshrbabashrlahrbagrvbiagrviagilvsgiawurhlvbishfgsdfrgviaywrvtia";
 const string short_string = "";
@@ -32,14 +32,14 @@ Ofast& operator<< (Ofast& out, nullptr_t) {
 }
 
 int main() {
-	fasterr("int: %\n", -45);
-	fasterr("char*: %\n", "test");
-	fasterr("double: %\n", 123.456);
-	fasterr("double: %\n", DBL_MAX);
-	fasterr("double: %\n", DBL_MIN);
-	fasterr("double: %\n", -DBL_MAX);
-	fasterr("float: %\n", FLT_MAX);
-	fasterr("vector<int>: %\n", vector{3, 4, 5});
+	fasterr.fmt<"int: %\n">(-45);
+	fasterr.fmt<"char*: %\n">("test");
+	fasterr.fmt<"double: %\n">(123.456);
+	fasterr.fmt<"double: %\n">(DBL_MAX);
+	fasterr.fmt<"double: %\n">(DBL_MIN);
+	fasterr.fmt<"double: %\n">(-DBL_MAX);
+	fasterr.fmt<"float: %\n">(FLT_MAX);
+	fasterr.fmt<"vector<int>: %\n">(vector{3, 4, 5});
 	fasterr << '\n' << nullptr;
 
 	SPEED_TEST(1e7, fastout << 0   , fastout.flush());
@@ -52,7 +52,7 @@ int main() {
 	SPEED_TEST(1e7, cout << ULONG_MAX       , cout.flush());
 	fasterr << '\n' << nullptr;
 
-	int i = 0;
+	[[maybe_unused]] int i = 0;
 	SPEED_TEST(1e7, fastout << &i            , fastout.flush());
 	SPEED_TEST(1e7, printf("%p\n", (void*)&i), fflush(stdout));
 	SPEED_TEST(1e7, cout << &i               , cout.flush());
@@ -78,11 +78,11 @@ int main() {
 	SPEED_TEST(1e7, cout << short_string                          , cout.flush());
 	fasterr << '\n' << nullptr;
 
-	SPEED_TEST(1e7, fastout(long_string.data()), fastout.flush());
+	SPEED_TEST(1e7, fastout.fmt<"sfhsfhgalsfhglsvgeshrbabashrlahrbagrvbiagrviagilvsgiawurhlvbishfgsdfrgviaywrvtia">(), fastout.flush());
 	SPEED_TEST(1e7, printf(long_string.data()) , fflush(stdout));
 	fasterr << '\n' << nullptr;
 
-	SPEED_TEST(1e7, fastout("%%%%%%%%%%", 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j')         , fastout.flush());
+	SPEED_TEST(1e7, fastout.fmt<"%%%%%%%%%%">('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j')     , fastout.flush());
 	SPEED_TEST(1e7, fastout << 'a' << 'b' << 'c' << 'd' << 'e' << 'f' << 'g' << 'h' << 'i' << 'j'   , fastout.flush());
 	SPEED_TEST(1e7, printf("%c%c%c%c%c%c%c%c%c%c", 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'), fflush(stdout));
 	SPEED_TEST(1e7, cout << 'a' << 'b' << 'c' << 'd' << 'e' << 'f' << 'g' << 'h' << 'i' << 'j'      , cout.flush());
@@ -93,25 +93,27 @@ int main() {
 	SPEED_TEST(1e7, printf("%f", 123.456)        , fflush(stdout));
 	SPEED_TEST(1e7, printf("%g", 123.456)        , fflush(stdout));
 	SPEED_TEST(1e7, cout << 123.456              , cout.flush());
-	fasterr << '\n';
+	fasterr << '\n' << nullptr;
 	
 	SPEED_TEST(1e6, fastout << DBL_MAX           , fastout.flush());
 	SPEED_TEST(1e6, fastout << (float)FLT_MAX    , fastout.flush());
 	SPEED_TEST(1e6, printf("%g", DBL_MAX)        , fflush(stdout));
 	SPEED_TEST(1e6, cout << DBL_MAX              , cout.flush());
-	fasterr << '\n';
+	fasterr << '\n' << nullptr;
 	
 	{
 		Ofast fout("tmp.txt");
 		for (size_t i = 0; i < 1e7; i++)
-			fout("% ", INT_MIN);
+			fout.fmt<"% ">(INT_MIN);
 		fout.flush();
+		close(fout.fd);
 	}
 
 	{
 		Ifast fin("tmp.txt");
 		int x;
 		SPEED_TEST(1e7, fin >> x, );
+		close(fin.fd);
 	}
 
 	{

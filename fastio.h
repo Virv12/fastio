@@ -26,13 +26,30 @@
 namespace IOfast {
 	using namespace std;
 
+	template <std::size_t N>
+	struct fixed_string {
+		std::array<char, N> buf;
+
+		constexpr fixed_string(const char s[]) noexcept {
+			for (size_t i = 0; i < N; i++)
+				buf[i] = s[i];
+		}
+
+		constexpr auto begin() noexcept { return buf.begin(); }
+		constexpr auto end()   noexcept { return buf.end();   }
+		constexpr auto begin() const noexcept { return buf.begin(); }
+		constexpr auto end()   const noexcept { return buf.end();   }
+	};
+
+	template <size_t N> fixed_string(const char (&)[N]) -> fixed_string<N-1>;
+
 	struct Ofast {
 		array<char, BUFFER_SIZE> buffer;
 		size_t idx = 0;
 		const int fd;
 
 		[[nodiscard]] explicit Ofast(const int fd) noexcept : fd(fd) {}
-		[[nodiscard]] explicit Ofast(const char* const f) noexcept : fd(open(f, O_WRONLY)) {}
+		[[nodiscard]] explicit Ofast(const char f[]) noexcept : fd(open(f, O_WRONLY | O_CREAT)) {}
 		Ofast(const Ofast&) = delete;
 		Ofast& operator= (const Ofast&) = delete;
 
@@ -164,36 +181,30 @@ namespace IOfast {
 			return *this;
 		}
 
-		template <class T>
-		void helper2(const size_t i, const T& v, const size_t j) noexcept {
-			if (i == j) *this << v;
-		}
+		template <fixed_string s, class ... T>
+		void fmt(const T& ... v) noexcept {
+			static_assert(std::count(s.begin(), s.end(), '%') == sizeof...(T));
 
-		template <class ... T, size_t ... Is>
-		void helper(const size_t i, const T& ... v, const index_sequence<Is...>) noexcept {
-			((helper2(i, v, Is)), ...);
-		}
+			auto pos = s.begin();
 
-		template <class ... T>
-		void operator() (const char* s, const T& ... v) noexcept {
-			size_t i = 0;
-			while (*s) {
-				if (*s == '%')
-					helper<T ...>(i++, v ..., make_index_sequence<sizeof...(T)>());
-				else
-					*this << *s;
-				s++;
-			}
+			[[maybe_unused]] const auto helper = [this, &pos](const auto& v) {
+				auto npos = std::find(pos, s.end(), '%');
+				*this << std::string_view(pos, npos);
+				*this << v;
+				pos = npos + 1;
+			};
+
+			(helper(v), ...);
+			*this << std::string_view(pos, s.end());
 		}
 	};
 
-	[[nodiscard]] constexpr array<bool, 256> digits() noexcept {
-		array<bool, 256> table {};
+	constexpr auto is_digit = [] {
+		array<bool, 256> is_digit {};
 		for (char c = '0'; c <= '9'; c++)
-			table[c] = true;
-		return table;
-	}
-	constexpr const array<bool, 256> is_digit = digits();
+			is_digit[c] = true;
+		return is_digit;
+	} ();
 
 	struct Ifast {
 		array<char, BUFFER_SIZE> buffer;
