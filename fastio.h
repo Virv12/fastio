@@ -175,7 +175,7 @@ namespace IOfast {
 
 		template <fixed_string s, class ... T>
 		void fmt(const T& ... v) noexcept {
-			static_assert(std::count(s.begin(), s.end(), '%') == sizeof...(T));
+			static_assert(std::count(s.begin(), s.end(), '%') == sizeof...(T), "Number of parameters does not match format string");
 
 			auto pos = s.begin();
 

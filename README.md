@@ -16,3 +16,23 @@ int main() {
   fastout.fmt<"X: %\n">(x);
 }
 ```
+
+```c++
+#include "fastio.h"
+
+IOfast::Ofast fastout(STDOUT_FILENO);
+
+struct S {
+	int a, b;
+};
+
+auto& operator<< (IOfast::Ofast& out, S s) {
+	return out << '{' << s.a << ", " << s.b << '}';
+}
+
+int main() {
+	S s{3, 4};
+	fastout << s << '\n';
+	fastout.fmt<"Custom type: %\n">(s);
+}
+```
