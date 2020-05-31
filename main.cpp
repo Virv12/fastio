@@ -9,11 +9,10 @@
 #include "fastio.h"
 #include "fastio_ext.h"
 using namespace std;
-using namespace IOfast;
 
-Ifast fastin(STDIN_FILENO);
-Ofast fastout(STDOUT_FILENO);
-Ofast fasterr(STDERR_FILENO);
+IOfast::Ifast fastin(STDIN_FILENO);
+IOfast::Ofast fastout(STDOUT_FILENO);
+IOfast::Ofast fasterr(STDERR_FILENO);
 
 long gettime() {
 	timespec t;
@@ -26,12 +25,15 @@ long gettime() {
 const string long_string = "sfhsfhgalsfhglsvgeshrbabashrlahrbagrvbiagrviagilvsgiawurhlvbishfgsdfrgviaywrvtia";
 const string short_string = "";
 
-Ofast& operator<< (Ofast& out, nullptr_t) {
+IOfast::Ofast& operator<< (IOfast::Ofast& out, nullptr_t) {
 	out.flush();
 	return out;
 }
 
 int main() {
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr);
+
 	fasterr.fmt<"int: %\n">(-45);
 	fasterr.fmt<"char*: %\n">("test");
 	fasterr.fmt<"double: %\n">(123.456);
@@ -102,13 +104,13 @@ int main() {
 	fasterr << '\n' << nullptr;
 	
 	{
-		Ofast fout("tmp.txt");
+		IOfast::Ofast fout("tmp.txt");
 		for (size_t i = 0; i < 1e7; i++)
 			fout.fmt<"% ">(INT_MIN);
 	}
 
 	{
-		Ifast fin("tmp.txt");
+		IOfast::Ifast fin("tmp.txt");
 		int x;
 		SPEED_TEST(1e7, fin >> x, );
 	}

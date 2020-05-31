@@ -20,8 +20,6 @@
 #endif
 
 namespace IOfast {
-	using namespace std;
-
 	template <std::size_t N>
 	struct fixed_string {
 		std::array<char, N> buf;
@@ -40,7 +38,7 @@ namespace IOfast {
 	template <size_t N> fixed_string(const char (&)[N]) -> fixed_string<N-1>;
 
 	struct Ofast {
-		array<char, BUFFER_SIZE> buffer;
+		std::array<char, BUFFER_SIZE> buffer;
 		size_t idx = 0;
 		const int fd;
 
@@ -73,18 +71,18 @@ namespace IOfast {
 			return *this;
 		}
 
-		template <class T, class = enable_if_t<is_integral<T>::value>,
-			class unsT = typename make_unsigned<T>::type>
+		template <class T, class = std::enable_if_t<std::is_integral<T>::value>,
+			class unsT = typename std::make_unsigned<T>::type>
 		Ofast& operator<< (const T a) noexcept {
-			array<char, (long)(sizeof(T) * log10(256)) + 1 + is_signed<T>::value> d;
+			std::array<char, (long)(sizeof(T) * log10(256)) + 1 + std::is_signed<T>::value> d;
 			uint8_t i = d.size();
 
 			static_assert(d.size() <= 256);
 
 			unsT u = a;
 
-			if constexpr (is_signed<T>::value)
-				if (signbit(a))
+			if constexpr (std::is_signed<T>::value)
+				if (std::signbit(a))
 					u = -u;
 
 			do {
@@ -92,8 +90,8 @@ namespace IOfast {
 				u /= 10;
 			} while (u);
 
-			if constexpr (is_signed<T>::value)
-				if (signbit(a))
+			if constexpr (std::is_signed<T>::value)
+				if (std::signbit(a))
 					d[--i] = '-';
 
 			flush_if(d.size() - i);
@@ -102,7 +100,7 @@ namespace IOfast {
 			return *this;
 		}
 
-		Ofast& operator<< (const char* const s) noexcept {
+		Ofast& operator<< (const char s[]) noexcept {
 			size_t len = strlen(s);
 			flush_if(len);
 			memcpy(&buffer[idx], s, len);
@@ -110,26 +108,26 @@ namespace IOfast {
 			return *this;
 		}
 
-		Ofast& operator<< (const string_view s) noexcept {
+		Ofast& operator<< (const std::string_view s) noexcept {
 			flush_if(s.size());
 			memcpy(&buffer[idx], s.data(), s.size());
 			idx += s.size();
 			return *this;
 		}
 
-		Ofast& operator<< (const string& s) noexcept {
+		Ofast& operator<< (const std::string& s) noexcept {
 			flush_if(s.size());
 			memcpy(&buffer[idx], s.data(), s.size());
 			idx += s.size();
 			return *this;
 		}
 
-		template <class T, class = enable_if_t<is_floating_point<T>::value>>
+		template <class T, class = std::enable_if_t<std::is_floating_point<T>::value>>
 		Ofast& operator<< (T f) noexcept {
 			constexpr size_t precision = 6;
 
-			if constexpr (is_signed<T>::value)
-				if (signbit(f)) {
+			if constexpr (std::is_signed<T>::value)
+				if (std::signbit(f)) {
 					*this << '-';
 					f *= -1;
 				}
@@ -163,7 +161,7 @@ namespace IOfast {
 		}
 
 		Ofast& operator<< (void* p) noexcept {
-			constexpr const char* const digits = "0123456789abcdef";
+			constexpr const char* digits = "0123456789abcdef";
 			flush_if(2 * sizeof(void*) + 2);
 
 			buffer[idx++] = '0';
@@ -194,14 +192,14 @@ namespace IOfast {
 	};
 
 	constexpr auto is_digit = [] {
-		array<bool, 256> is_digit {};
+		std::array<bool, 256> is_digit {};
 		for (char c = '0'; c <= '9'; c++)
 			is_digit[c] = true;
 		return is_digit;
 	} ();
 
 	struct Ifast {
-		array<char, BUFFER_SIZE> buffer;
+		std::array<char, BUFFER_SIZE> buffer;
 		size_t idx = 0, size = 0;
 		const int fd;
 
@@ -231,12 +229,12 @@ namespace IOfast {
 			return *this;
 		}
 
-		template <class T, class = enable_if_t<is_integral<T>::value>>
+		template <class T, class = std::enable_if_t<std::is_integral<T>::value>>
 		Ifast& operator>> (T& i) noexcept {
 			while (flush(), buffer[idx] <= 32) idx ++;
 
 			bool sign = false;
-			if constexpr (is_signed<T>::value)
+			if constexpr (std::is_signed<T>::value)
 				if (buffer[idx] == '-') {
 					sign = 1;
 					idx++;
@@ -246,7 +244,7 @@ namespace IOfast {
 			while (flush(), is_digit[buffer[idx]])
 				i = 10 * i + buffer[idx++] - '0';
 
-			if constexpr (is_signed<T>::value)
+			if constexpr (std::is_signed<T>::value)
 				if (sign) i *= -1;
 
 			return *this;
