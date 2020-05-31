@@ -13,7 +13,6 @@ int main() {
   fastin >> x;
   
   fastout << "X: " << x << '\n';
-  fastout("X: %\n", x);
-  fastout.flush();
+  fastout.fmt<"X: %\n">(x);
 }
 ```

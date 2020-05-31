@@ -105,15 +105,12 @@ int main() {
 		Ofast fout("tmp.txt");
 		for (size_t i = 0; i < 1e7; i++)
 			fout.fmt<"% ">(INT_MIN);
-		fout.flush();
-		close(fout.fd);
 	}
 
 	{
 		Ifast fin("tmp.txt");
 		int x;
 		SPEED_TEST(1e7, fin >> x, );
-		close(fin.fd);
 	}
 
 	{
@@ -127,5 +124,4 @@ int main() {
 		ifstream fin("tmp.txt");
 		SPEED_TEST(1e7, fin >> x, );
 	}
-	fasterr.flush();
 }

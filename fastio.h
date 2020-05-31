@@ -19,10 +19,6 @@
 #define BUFFER_SIZE 1 << 16
 #endif
 
-#ifndef NO_AUTO_FLUSH
-#define NO_AUTO_FLUSH 1
-#endif
-
 namespace IOfast {
 	using namespace std;
 
@@ -53,12 +49,10 @@ namespace IOfast {
 		Ofast(const Ofast&) = delete;
 		Ofast& operator= (const Ofast&) = delete;
 
-#if NO_AUTO_FLUSH < 1
 		~Ofast() {
 			flush();
 			close(fd);
 		}
-#endif
 
 		void flush() noexcept {
 			[[maybe_unused]] ssize_t rc = write(fd, buffer.data(), idx);
@@ -67,7 +61,7 @@ namespace IOfast {
 		}
 
 		void flush_if(size_t x) noexcept {
-#if NO_AUTO_FLUSH < 2
+#ifndef NO_AUTO_FLUSH
 			if (buffer.size() - idx < x)
 				flush();
 #endif
@@ -216,8 +210,12 @@ namespace IOfast {
 		Ifast(const Ifast&) = delete;
 		Ifast& operator= (const Ifast&) = delete;
 
+		~Ifast() {
+			close(fd);
+		}
+
 		void flush() noexcept {
-#if NO_AUTO_FLUSH < 2
+#ifndef NO_AUTO_FLUSH
 			if (idx == size) {
 				ssize_t s = read(fd, buffer.data(), buffer.size());
 				assert(s >= 0);
