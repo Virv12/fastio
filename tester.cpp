@@ -44,5 +44,5 @@ int main() {
 			loading_bar("Ofast << short", i * 100l / (1 << 16));
 	} while (i);
 
-	fputs("Ofast <<< short; success\n", stderr);
+	fputs("Ofast << short; success\n", stderr);
 }

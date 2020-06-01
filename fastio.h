@@ -43,7 +43,7 @@ namespace IOfast {
 		const int fd;
 
 		[[nodiscard]] explicit Ofast(const int fd) noexcept : fd(fd) {}
-		[[nodiscard]] explicit Ofast(const char f[]) noexcept : fd(open(f, O_WRONLY | O_CREAT)) {}
+		[[nodiscard]] explicit Ofast(const char f[]) noexcept : fd(open(f, O_WRONLY | O_CREAT, 0644)) {}
 		Ofast(const Ofast&) = delete;
 		Ofast& operator= (const Ofast&) = delete;
 
