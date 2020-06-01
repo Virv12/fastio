@@ -13,6 +13,6 @@ main: main.cpp fastio.h
 	$(CC) -o $@ $<
 
 clean:
-	rm -rf main
+	rm -rf main tester tmp.txt
 
 .PHONY: run test clean
