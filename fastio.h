@@ -167,11 +167,11 @@ namespace IOfast {
 			uint8_t i = d.size();
 
 			static_assert(d.size() <= 256);
-			static_assert(sizeof(long) == sizeof(void*));
+			static_assert(sizeof(size_t) == sizeof(void*));
 
 			do {
-				d[--i] = digits[(long)p & 0xF];
-				p = (void*)((long)p >> 4);
+				d[--i] = digits[(size_t)p & 0xF];
+				p = (void*)((size_t)p >> 4);
 			} while (p);
 
 			d[--i] = 'x';
@@ -180,6 +180,7 @@ namespace IOfast {
 			flush_if(d.size() - i);
 			memcpy(&buffer[idx], &d[i], d.size() - i);
 			idx += d.size() - i;
+
 			return *this;
 		}
 
