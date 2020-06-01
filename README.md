@@ -14,6 +14,8 @@ int main() {
   
   fastout << "X: " << x << '\n';
   fastout.fmt<"X: %\n">(x);
+
+  fastout.flush();
 }
 ```
 
@@ -34,5 +36,6 @@ int main() {
 	S s{3, 4};
 	fastout << s << '\n';
 	fastout.fmt<"Custom type: %\n">(s);
+	fastout.flush();
 }
 ```

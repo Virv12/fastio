@@ -47,10 +47,10 @@ namespace IOfast {
 		Ofast(const Ofast&) = delete;
 		Ofast& operator= (const Ofast&) = delete;
 
-		~Ofast() {
-			flush();
-			close(fd);
-		}
+		// ~Ofast() {
+		// 	flush();
+		// 	close(fd);
+		// }
 
 		void flush() noexcept {
 			[[maybe_unused]] ssize_t rc = write(fd, buffer.data(), idx);
@@ -208,9 +208,9 @@ namespace IOfast {
 		Ifast(const Ifast&) = delete;
 		Ifast& operator= (const Ifast&) = delete;
 
-		~Ifast() {
-			close(fd);
-		}
+		// ~Ifast() {
+		// 	close(fd);
+		// }
 
 		void flush() noexcept {
 #ifndef NO_AUTO_FLUSH
