@@ -34,6 +34,8 @@ int main() {
 	ios_base::sync_with_stdio(false);
 	cin.tie(nullptr);
 
+	int ptr = 0;
+
 	fasterr.fmt<"int: %\n">(-45);
 	fasterr.fmt<"char*: %\n">("test");
 	fasterr.fmt<"double: %\n">(123.456);
@@ -41,6 +43,7 @@ int main() {
 	fasterr.fmt<"double: %\n">(DBL_MIN);
 	fasterr.fmt<"double: %\n">(-DBL_MAX);
 	fasterr.fmt<"float: %\n">(FLT_MAX);
+	fasterr.fmt<"void*: %\n">(&ptr);
 	fasterr.fmt<"vector<int>: %\n">(vector{3, 4, 5});
 	fasterr << '\n' << nullptr;
 
@@ -54,10 +57,9 @@ int main() {
 	SPEED_TEST(1e7, cout << ULONG_MAX       , cout.flush());
 	fasterr << '\n' << nullptr;
 
-	[[maybe_unused]] int i = 0;
-	SPEED_TEST(1e7, fastout << &i            , fastout.flush());
-	SPEED_TEST(1e7, printf("%p\n", (void*)&i), fflush(stdout));
-	SPEED_TEST(1e7, cout << &i               , cout.flush());
+	SPEED_TEST(1e7, fastout << &ptr            , fastout.flush());
+	SPEED_TEST(1e7, printf("%p\n", (void*)&ptr), fflush(stdout));
+	SPEED_TEST(1e7, cout << &ptr               , cout.flush());
 	fasterr << '\n' << nullptr;
 
 	SPEED_TEST(1e7, fastout << long_string                       , fastout.flush());

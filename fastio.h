@@ -162,14 +162,24 @@ namespace IOfast {
 
 		Ofast& operator<< (void* p) noexcept {
 			constexpr const char* digits = "0123456789abcdef";
-			flush_if(2 * sizeof(void*) + 2);
 
-			buffer[idx++] = '0';
-			buffer[idx++] = 'x';
+			std::array<char, 2 * sizeof(void*) + 2> d;
+			uint8_t i = d.size();
 
-			for (ssize_t mask = 8 * sizeof(void*) - 4; mask >= 0; mask -= 4)
-				buffer[idx++] = digits[(long)p >> mask & 0xF];
+			static_assert(d.size() <= 256);
+			static_assert(sizeof(long) == sizeof(void*));
 
+			do {
+				d[--i] = digits[(long)p & 0xF];
+				p = (void*)((long)p >> 4);
+			} while (p);
+
+			d[--i] = 'x';
+			d[--i] = '0';
+
+			flush_if(d.size() - i);
+			memcpy(&buffer[idx], &d[i], d.size() - i);
+			idx += d.size() - i;
 			return *this;
 		}
 
