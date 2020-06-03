@@ -13,7 +13,7 @@ int main() {
   fastin >> x;
   
   fastout << "X: " << x << '\n';
-  fastout.fmt<"X: %\n">(x);
+  fastout.fmt<"X: %\n">(x);      // Only with c++20
 
   fastout.flush();
 }
@@ -35,7 +35,7 @@ auto& operator<< (IOfast::Ofast& out, S s) {
 int main() {
 	S s{3, 4};
 	fastout << s << '\n';
-	fastout.fmt<"Custom type: %\n">(s);
+	fastout.fmt<"Custom type: %\n">(s);  // Only with c++20
 	fastout.flush();
 }
 ```

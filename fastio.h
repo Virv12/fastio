@@ -20,6 +20,7 @@
 #endif
 
 namespace IOfast {
+#if (__cpp_nontype_template_parameter_class || (__cpp_nontype_template_args >= 201911L))
 	template <std::size_t N>
 	struct fixed_string {
 		std::array<char, N> buf;
@@ -36,6 +37,7 @@ namespace IOfast {
 	};
 
 	template <size_t N> fixed_string(const char (&)[N]) -> fixed_string<N-1>;
+#endif
 
 	struct Ofast {
 		std::array<char, BUFFER_SIZE> buffer;
@@ -184,6 +186,7 @@ namespace IOfast {
 			return *this;
 		}
 
+#if (__cpp_nontype_template_parameter_class || (__cpp_nontype_template_args >= 201911L))
 		template <fixed_string s, class ... T>
 		void fmt(const T& ... v) noexcept {
 			static_assert(std::count(s.begin(), s.end(), '%') == sizeof...(T), "Number of parameters does not match format string");
@@ -200,9 +203,10 @@ namespace IOfast {
 			(helper(v), ...);
 			*this << std::string_view(pos, s.end());
 		}
+#endif
 	};
 
-	constexpr auto is_digit = [] {
+	constexpr static auto is_digit = [] {
 		std::array<bool, 256> is_digit {};
 		for (char c = '0'; c <= '9'; c++)
 			is_digit[c] = true;
