@@ -1,12 +1,10 @@
+#include "fastio.h"
 #include <cstdio>
 #include <cstdlib>
-
 #include <unistd.h>
-
-#include "fastio.h"
 using namespace std;
 
-void loading_bar(const char* const str, const int perc) {
+void loading_bar(char const str[], int const perc) {
 	fprintf(stderr, "%s [", str);
 	for (int i = 0; i < 100; i++)
 		fputc(i < perc ? '#' : '-', stderr);
@@ -37,11 +35,10 @@ int main() {
 			fprintf(stderr, "error printing short %hd\n", a);
 			exit(1);
 		}
-		
+
 		i++;
 
-		if ((i & 0xF) == 0)
-			loading_bar("Ofast << short", i * 100l / (1 << 16));
+		if ((i & 0xF) == 0) loading_bar("Ofast << short", i * 100l / (1 << 16));
 	} while (i);
 
 	fputs("Ofast << short; success\n", stderr);

@@ -18,25 +18,25 @@ namespace IOfast {
 		return out;
 	}
 
-	template <class T> Ofast &operator<<(Ofast &out, const std::vector<T> &v) noexcept {
+	template <class T, class A> Ofast &operator<<(Ofast &out, std::vector<T, A> const &v) noexcept {
 		out << "std::vector";
 		print_iters(out, v.begin(), v.end());
 		return out;
 	}
 
-	template <class T, size_t N> Ofast &operator<<(Ofast &out, const std::array<T, N> &a) noexcept {
+	template <class T, size_t N> Ofast &operator<<(Ofast &out, std::array<T, N> const &a) noexcept {
 		out << "std::array";
 		print_iters(out, a.begin(), a.end());
 		return out;
 	}
 
-	template <class T> Ofast &operator<<(Ofast &out, const std::set<T> &s) noexcept {
+	template <class T, class C, class A> Ofast &operator<<(Ofast &out, std::set<T, C, A> const &s) noexcept {
 		out << "std::set";
 		print_iters(out, s.begin(), s.end());
 		return out;
 	}
 
-	template <class T1, class T2> Ofast &operator<<(Ofast &out, const std::pair<T1, T2> &p) noexcept {
+	template <class T1, class T2> Ofast &operator<<(Ofast &out, std::pair<T1, T2> const &p) noexcept {
 		return out << "std::pair{" << p.first << ", " << p.second < '}';
 	}
 } // namespace IOfast

@@ -33,13 +33,13 @@ namespace IOfast {
 		constexpr auto end() const noexcept { return buf.end(); }
 	};
 
-	template <size_t N> fixed_string(const char (&)[N]) -> fixed_string<N - 1>;
+	template <size_t N> fixed_string(char const (&)[N]) -> fixed_string<N - 1>;
 #endif
 
 	struct Ofast {
 		std::array<char, BUFFER_SIZE> buffer;
 		size_t idx = 0;
-		const int fd;
+		int const fd;
 
 		[[nodiscard]] explicit Ofast(int const fd) noexcept : fd(fd) {}
 		[[nodiscard]] explicit Ofast(char const f[]) noexcept : fd(open(f, O_WRONLY | O_CREAT, 0644)) {}
@@ -71,7 +71,7 @@ namespace IOfast {
 
 		template <class T, class = std::enable_if_t<std::is_integral<T>::value>,
 				  class unsT = typename std::make_unsigned<T>::type>
-		Ofast &operator<<(const T a) noexcept {
+		Ofast &operator<<(T const a) noexcept {
 			std::array<char, (long)(sizeof(T) * log10(256)) + 1 + std::is_signed<T>::value> d;
 			uint8_t i = d.size();
 
@@ -96,7 +96,7 @@ namespace IOfast {
 			return *this;
 		}
 
-		Ofast &operator<<(const char s[]) noexcept {
+		Ofast &operator<<(char const s[]) noexcept {
 			size_t len = strlen(s);
 			flush_if(len);
 			memcpy(&buffer[idx], s, len);
@@ -104,14 +104,14 @@ namespace IOfast {
 			return *this;
 		}
 
-		Ofast &operator<<(const std::string_view s) noexcept {
+		Ofast &operator<<(std::string_view const s) noexcept {
 			flush_if(s.size());
 			memcpy(&buffer[idx], s.data(), s.size());
 			idx += s.size();
 			return *this;
 		}
 
-		Ofast &operator<<(const std::string &s) noexcept {
+		Ofast &operator<<(std::string const &s) noexcept {
 			flush_if(s.size());
 			memcpy(&buffer[idx], s.data(), s.size());
 			idx += s.size();
@@ -156,7 +156,7 @@ namespace IOfast {
 		}
 
 		Ofast &operator<<(void *p) noexcept {
-			constexpr const char *digits = "0123456789abcdef";
+			constexpr char const *digits = "0123456789abcdef";
 
 			std::array<char, 2 * sizeof(void *) + 2> d;
 			uint8_t i = d.size();
@@ -186,7 +186,7 @@ namespace IOfast {
 
 			auto pos = s.begin();
 
-			[[maybe_unused]] const auto helper = [this, &pos](auto &&v) {
+			[[maybe_unused]] auto const helper = [this, &pos](auto &&v) {
 				auto npos = std::find(pos, s.end(), '%');
 				*this << std::string_view(pos, npos);
 				*this << std::forward<decltype(v)>(v);
@@ -209,12 +209,12 @@ namespace IOfast {
 	struct Ifast {
 		std::array<char, BUFFER_SIZE> buffer;
 		size_t idx = 0, size = 0;
-		const int fd;
+		int const fd;
 
-		[[nodiscard]] explicit Ifast(const int fd) noexcept : fd(fd) {}
-		[[nodiscard]] explicit Ifast(const char *const f) noexcept : fd(open(f, O_RDONLY)) {}
-		Ifast(const Ifast &) = delete;
-		Ifast &operator=(const Ifast &) = delete;
+		[[nodiscard]] explicit Ifast(int const fd) noexcept : fd(fd) {}
+		[[nodiscard]] explicit Ifast(char const f[]) noexcept : fd(open(f, O_RDONLY)) {}
+		Ifast(Ifast const &) = delete;
+		Ifast &operator=(Ifast const &) = delete;
 
 		// ~Ifast() {
 		// 	close(fd);

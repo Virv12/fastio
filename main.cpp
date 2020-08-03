@@ -29,8 +29,8 @@ long gettime() {
 		fasterr.fmt<"%ns\t%\n">(to_string((double)__time / n), #fn);                                                   \
 	}
 
-const string long_string = "sfhsfhgalsfhglsvgeshrbabashrlahrbagrvbiagrviagilvsgiawurhlvbishfgsdfrgviaywrvtia";
-const string short_string = "";
+string const long_string = "sfhsfhgalsfhglsvgeshrbabashrlahrbagrvbiagrviagilvsgiawurhlvbishfgsdfrgviaywrvtia";
+string const short_string = "";
 
 IOfast::Ofast &operator<<(IOfast::Ofast &out, nullptr_t) {
 	out.flush();
