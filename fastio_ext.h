@@ -1,13 +1,11 @@
+#include "fastio.h"
 #include <array>
 #include <set>
-#include <vector>
 #include <utility>
-
-#include "fastio.h"
+#include <vector>
 
 namespace IOfast {
-	template <class T>
-	Ofast& print_iters(Ofast& out, T begin, T end) noexcept {
+	template <class T> Ofast &print_iters(Ofast &out, T begin, T end) noexcept {
 		out << '{';
 		while (begin != end) {
 			out << *begin;
@@ -20,29 +18,25 @@ namespace IOfast {
 		return out;
 	}
 
-	template <class T>
-	Ofast& operator<<(Ofast& out, const std::vector<T>& v) noexcept {
+	template <class T> Ofast &operator<<(Ofast &out, const std::vector<T> &v) noexcept {
 		out << "std::vector";
 		print_iters(out, v.begin(), v.end());
 		return out;
 	}
 
-	template <class T, size_t N>
-	Ofast& operator<<(Ofast& out, const std::array<T, N>& a) noexcept {
+	template <class T, size_t N> Ofast &operator<<(Ofast &out, const std::array<T, N> &a) noexcept {
 		out << "std::array";
 		print_iters(out, a.begin(), a.end());
 		return out;
 	}
 
-	template <class T>
-	Ofast& operator<<(Ofast& out, const std::set<T>& s) noexcept {
+	template <class T> Ofast &operator<<(Ofast &out, const std::set<T> &s) noexcept {
 		out << "std::set";
 		print_iters(out, s.begin(), s.end());
 		return out;
 	}
 
-	template <class T1, class T2>
-	Ofast& operator<<(Ofast& out, const std::pair<T1, T2>& p) noexcept {
+	template <class T1, class T2> Ofast &operator<<(Ofast &out, const std::pair<T1, T2> &p) noexcept {
 		return out << "std::pair{" << p.first << ", " << p.second < '}';
 	}
-}
+} // namespace IOfast

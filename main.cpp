@@ -1,13 +1,11 @@
-#include <cfloat>
-#include <climits>
-
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <string_view>
-
 #include "fastio.h"
 #include "fastio_ext.h"
+#include <cfloat>
+#include <climits>
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <string_view>
 using namespace std;
 
 IOfast::Ifast fastin(STDIN_FILENO);
@@ -20,12 +18,21 @@ long gettime() {
 	return t.tv_sec * (long)1e9 + t.tv_nsec;
 }
 
-#define SPEED_TEST(n, fn, end) { size_t i = n; long __time = gettime(); while (i--) fn; end; __time = gettime() - __time; fasterr.fmt<"%ns\t%\n">(to_string((double)__time / n), #fn); }
+#define SPEED_TEST(n, fn, end)                                                                                         \
+	{                                                                                                                  \
+		size_t i = n;                                                                                                  \
+		long __time = gettime();                                                                                       \
+		while (i--)                                                                                                    \
+			fn;                                                                                                        \
+		end;                                                                                                           \
+		__time = gettime() - __time;                                                                                   \
+		fasterr.fmt<"%ns\t%\n">(to_string((double)__time / n), #fn);                                                   \
+	}
 
 const string long_string = "sfhsfhgalsfhglsvgeshrbabashrlahrbagrvbiagrviagilvsgiawurhlvbishfgsdfrgviaywrvtia";
 const string short_string = "";
 
-IOfast::Ofast& operator<< (IOfast::Ofast& out, nullptr_t) {
+IOfast::Ofast &operator<<(IOfast::Ofast &out, nullptr_t) {
 	out.flush();
 	return out;
 }
@@ -47,6 +54,7 @@ int main() {
 	fasterr.fmt<"vector<int>: %\n">(vector{3, 4, 5});
 	fasterr << '\n' << nullptr;
 
+	// clang-format off
 	SPEED_TEST(1e7, fastout << 0   , fastout.flush());
 	SPEED_TEST(1e7, printf("%d", 0), fflush(stdout));
 	SPEED_TEST(1e7, cout << 0      , cout.flush());
@@ -104,7 +112,8 @@ int main() {
 	SPEED_TEST(1e6, printf("%g", DBL_MAX)        , fflush(stdout));
 	SPEED_TEST(1e6, cout << DBL_MAX              , cout.flush());
 	fasterr << '\n' << nullptr;
-	
+	// clang-format on
+
 	{
 		IOfast::Ofast fout("tmp.txt");
 		for (size_t i = 0; i < 1e7; i++)
@@ -122,7 +131,7 @@ int main() {
 
 	{
 		int x;
-		FILE* fin = fopen("tmp.txt", "rt");
+		FILE *fin = fopen("tmp.txt", "rt");
 		SPEED_TEST(1e7, fscanf(fin, "%d", &x), );
 	}
 
