@@ -1,6 +1,7 @@
 #include "fastio.h"
 #include <array>
 #include <set>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -38,5 +39,12 @@ namespace IOfast {
 
 	template <class T1, class T2> Ofast &operator<<(Ofast &out, std::pair<T1, T2> const &p) noexcept {
 		return out << "std::pair{" << p.first << ", " << p.second < '}';
+	}
+
+	template <class... T> Ofast &operator<<(Ofast &out, std::tuple<T...> const &t) noexcept {
+		out << "std::tuple{";
+		size_t n = 0;
+		std::apply([&out](auto const &... args) { ((out << args << (++n != sizeof...(T) ? ", " : "")), ...); }, t);
+		return out << '}';
 	}
 } // namespace IOfast
