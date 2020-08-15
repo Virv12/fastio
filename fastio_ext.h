@@ -44,7 +44,7 @@ namespace IOfast {
 	template <class... T> Ofast &operator<<(Ofast &out, std::tuple<T...> const &t) noexcept {
 		out << "std::tuple{";
 		size_t n = 0;
-		std::apply([&out](auto const &... args) { ((out << args << (++n != sizeof...(T) ? ", " : "")), ...); }, t);
+		std::apply([&out, &n](auto const &... args) { ((out << args << (++n != sizeof...(T) ? ", " : "")), ...); }, t);
 		return out << '}';
 	}
 } // namespace IOfast

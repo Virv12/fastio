@@ -66,8 +66,15 @@ int main() {
 	fasterr << '\n' << nullptr;
 
 	SPEED_TEST(1e7, fastout << &ptr            , fastout.flush());
-	SPEED_TEST(1e7, printf("%p\n", (void*)&ptr), fflush(stdout));
+	SPEED_TEST(1e7, printf("%p", (void*)&ptr), fflush(stdout));
 	SPEED_TEST(1e7, cout << &ptr               , cout.flush());
+	fasterr << '\n' << nullptr;
+
+	SPEED_TEST(1e7, fastout << 'A'   , fastout.flush());
+	SPEED_TEST(1e7, printf("%c", 'A'), fflush(stdout));
+	SPEED_TEST(1e7, putchar('A')     , fflush(stdout));
+	SPEED_TEST(1e7, cout << 'A'      , cout.flush());
+	SPEED_TEST(1e7, cout.put('A')    , cout.flush());
 	fasterr << '\n' << nullptr;
 
 	SPEED_TEST(1e7, fastout << long_string                       , fastout.flush());
